@@ -1,9 +1,26 @@
 'use client';
 
+import { useState } from 'react';
+import { Header } from '../layout/header';
+import { Trips } from '../trips/trips';
+
 export const HomePage = () => {
+  const [searchParams, setSearchParams] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
   return (
-    <div className='w-full min-h-screen flex flex-col items-center justify-center'>
-      <section className='w-full p-16 max-w-7xl '>Solo</section>
+    <div className='min-h-screen'>
+      <Header />
+
+      <Trips />
+
+      {/* <SearchSection onSearch={handleSearch} isSearching={isSearching} /> */}
+
+      {/* {searchParams ? (
+        <SearchResults searchParams={searchParams} />
+      ) : (
+        <FeaturedTrips />
+      )} */}
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { Spinner } from '@/components/ui/spinner';
 import { LandingPage } from '@/components/home/landing-page';
 import { HomePage } from '@/components/home/home-page';
+import { Dashboard } from '@/components/dashboard/dashboard';
+import { TripForm } from '@/components/forms/trip-form';
 
 export default function App() {
   return (
