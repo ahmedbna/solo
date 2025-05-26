@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/providers/theme-provider';
-import { ConvexClientProvider } from '@/providers/convex-client-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { ConvexAuthenticationProvider } from '@/providers/convex-auth-provider';
 import './globals.css';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,21 +28,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <ConvexClientProvider>
+      <ConvexAuthenticationProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <ThemeProvider
+            enableSystem
             attribute='class'
             defaultTheme='dark'
-            enableSystem
             disableTransitionOnChange
           >
-            <main>{children}</main>
+            <TooltipProvider>
+              <main>{children}</main>
+            </TooltipProvider>
             <Toaster />
           </ThemeProvider>
         </body>
-      </ConvexClientProvider>
+      </ConvexAuthenticationProvider>
     </html>
   );
 }

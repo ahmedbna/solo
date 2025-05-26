@@ -12,6 +12,10 @@ export const get = query({
 
     const user = await ctx.db.get(authId);
 
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     return user;
   },
 });

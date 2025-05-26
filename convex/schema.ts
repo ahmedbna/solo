@@ -18,47 +18,25 @@ export default defineSchema({
 
   // Travel agencies that users can create and manage
   agencies: defineTable({
+    ownerId: v.id('users'),
     name: v.string(),
-    description: v.optional(v.string()),
+    bio: v.optional(v.string()),
     logo: v.optional(v.string()),
     website: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
-    address: v.optional(
+    socialMedia: v.optional(
       v.object({
-        street: v.string(),
-        city: v.string(),
-        state: v.optional(v.string()),
-        country: v.string(),
-        postalCode: v.optional(v.string()),
+        facebook: v.optional(v.string()),
+        instagram: v.optional(v.string()),
+        twitter: v.optional(v.string()),
+        linkedin: v.optional(v.string()),
+        youtube: v.optional(v.string()),
       })
     ),
-    // Business information
-    businessType: v.string(),
-    licenseNumber: v.optional(v.string()),
-    // Agency settings
-    settings: v.object({
-      currency: v.string(), // Default currency
-      timezone: v.string(),
-      language: v.string(),
-      bookingPrefix: v.string(), // Prefix for booking numbers
-      commissionRate: v.optional(v.number()), // Default commission percentage
-      // Feature toggles
-      features: v.object({
-        multiCityBookings: v.boolean(),
-        groupBookings: v.boolean(),
-        customItineraries: v.boolean(),
-        priceManagement: v.boolean(),
-        analyticsReporting: v.boolean(),
-        apiAccess: v.boolean(),
-      }),
-    }),
-    ownerId: v.id('users'), // Agency owner
-    isActive: v.boolean(),
-    updatedAt: v.number(),
+    taxId: v.optional(v.string()),
   })
     .index('by_owner', ['ownerId'])
-    .index('by_status', ['isActive'])
     .index('by_name', ['name']),
 
   // Agency members and their roles
