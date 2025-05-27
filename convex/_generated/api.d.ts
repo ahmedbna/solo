@@ -16,6 +16,7 @@ import type {
 import type * as agencies from "../agencies.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as trips from "../trips.js";
 import type * as users from "../users.js";
 
 /**
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   agencies: typeof agencies;
   auth: typeof auth;
   http: typeof http;
+  trips: typeof trips;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

@@ -25,11 +25,13 @@ export const Header = () => {
   const agencies = useQuery(api.agencies.getUserAgencies);
 
   return (
-    <header className='bg-background border-b border-muted sticky top-0 z-50 shadow-sm'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+    <header className='fixed top-0 left-0 right-0 z-50 h-14 flex items-center gap-2 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+      <div className='w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-16'>
           <div className='flex items-center space-x-2'>
-            <span className='text-2xl font-black'>Solo</span>
+            <Link href='/' className='text-3xl font-black'>
+              Solo
+            </Link>
           </div>
 
           <div className='flex items-center space-x-4'>
@@ -61,9 +63,7 @@ export const Header = () => {
                 </DropdownMenu>
               )
             ) : (
-              <CreateAgencyDialog
-                onSuccess={(agencyId) => router.push(`/agency/${agencyId}`)}
-              />
+              <CreateAgencyDialog />
             )}
 
             <ModeToggle />

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@auth/core": "0.37.0",
+    "@aws-sdk/client-s3": "^3.817.0",
+    "@aws-sdk/s3-request-presigner": "^3.817.0",
     "@convex-dev/auth": "^0.0.86",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -35,6 +37,7 @@
     "react-country-state-city": "^1.1.12",
     "react-day-picker": "8.10.1",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.56.4",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",

@@ -1,10 +1,9 @@
 'use client';
 
-import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { Spinner } from '@/components/ui/spinner';
-import { LandingPage } from '@/components/home/landing-page';
 import { HomePage } from '@/components/home/home-page';
-import { Header } from '@/components/layout/header';
+import { LandingPage } from '@/components/home/landing-page';
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 
 export default function App() {
   return (
@@ -18,7 +17,6 @@ export default function App() {
         <LandingPage />
       </Unauthenticated>
       <Authenticated>
-        <Header />
         <HomePage />
       </Authenticated>
     </>

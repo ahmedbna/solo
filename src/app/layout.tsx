@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ConvexAuthenticationProvider } from '@/providers/convex-auth-provider';
 import './globals.css';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Header } from '@/components/layout/header';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,6 +40,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TooltipProvider>
+              <Header />
+              <div className='h-14' />
               <main>{children}</main>
             </TooltipProvider>
             <Toaster />

@@ -7,7 +7,30 @@ export const createAgency = mutation({
   args: {
     name: v.string(),
     bio: v.optional(v.string()),
-    logo: v.optional(v.string()),
+    logo: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
     website: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
@@ -63,8 +86,10 @@ export const createAgency = mutation({
 });
 
 // Get agency by ID
-export const getAgency = query({
-  args: { agencyId: v.id('agencies') },
+export const get = query({
+  args: {
+    agencyId: v.id('agencies'),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error('Authentication required');
@@ -118,7 +143,30 @@ export const updateAgency = mutation({
     agencyId: v.id('agencies'),
     name: v.optional(v.string()),
     bio: v.optional(v.string()),
-    logo: v.optional(v.string()),
+    logo: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
     website: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),

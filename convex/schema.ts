@@ -21,7 +21,30 @@ export default defineSchema({
     ownerId: v.id('users'),
     name: v.string(),
     bio: v.optional(v.string()),
-    logo: v.optional(v.string()),
+    logo: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
     website: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
@@ -133,34 +156,38 @@ export default defineSchema({
     agencyId: v.id('agencies'),
     createdBy: v.id('users'),
     title: v.string(),
-    description: v.string(),
-    images: v.array(v.string()),
-
-    country: v.string(),
-    destinations: v.array(v.string()), // e.g., "US"
-
-    inclusions: v.array(v.string()),
-    exclusions: v.array(v.string()),
-    basePrice: v.number(),
     type: v.union(v.literal('domestic'), v.literal('international')),
+
+    description: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
+
+    country: v.optional(v.string()), // e.g., "US"
+    destinations: v.optional(v.array(v.string())), // e.g., "US"
+
+    inclusions: v.optional(v.array(v.string())),
+    exclusions: v.optional(v.array(v.string())),
+    basePrice: v.number(),
     status: v.union(
       v.literal('draft'),
       v.literal('active'),
       v.literal('archived')
     ),
-    itinerary: v.array(
-      v.object({
-        title: v.string(),
-        description: v.string(),
-        dayNumber: v.number(),
-        images: v.array(v.string()),
-        city: v.optional(v.string()),
-        country: v.optional(v.string()),
-        latitude: v.optional(v.number()),
-        longitude: v.optional(v.number()),
-        activityType: v.optional(v.string()),
-        estimatedDuration: v.optional(v.string()),
-      })
+
+    itinerary: v.optional(
+      v.array(
+        v.object({
+          title: v.optional(v.string()),
+          description: v.optional(v.string()),
+          dayNumber: v.number(),
+          images: v.optional(v.array(v.string())),
+          city: v.optional(v.string()),
+          country: v.optional(v.string()),
+          latitude: v.optional(v.number()),
+          longitude: v.optional(v.number()),
+          activityType: v.optional(v.string()),
+          estimatedDuration: v.optional(v.string()),
+        })
+      )
     ),
   })
     .index('by_type', ['type'])
@@ -173,83 +200,34 @@ export default defineSchema({
 
   // Trip waves - specific instances of a trip template
   waves: defineTable({
-    // Reference to the base trip template
-    tripTemplateId: v.id('tripTemplates'),
-
-    // Wave-specific details
-    waveName: v.optional(v.string()), // e.g., "October Wave", "Holiday Special"
-    waveNumber: v.number(), // 1, 2, 3, etc.
-
-    // Wave-specific dates
+    tripId: v.id('trips'),
+    title: v.optional(v.string()), // e.g., "October Wave", "Holiday Special"
+    version: v.number(), // 1, 2, 3, etc.
     startDate: v.number(),
     endDate: v.number(),
     registrationDeadline: v.optional(v.number()),
-
-    // Wave-specific capacity and pricing
     capacity: v.number(),
     availableSpots: v.number(),
     pricePerPerson: v.number(), // Can override base price
-    priceModifier: v.optional(v.number()), // Percentage modifier from base price
-
-    // Wave-specific modifications (optional overrides)
-    modifications: v.optional(
-      v.object({
-        title: v.optional(v.string()),
-        description: v.optional(v.string()),
-        images: v.optional(v.array(v.string())),
-        inclusions: v.optional(v.array(v.string())),
-        exclusions: v.optional(v.array(v.string())),
-        itineraryChanges: v.optional(
-          v.array(
-            v.object({
-              dayNumber: v.number(),
-              changes: v.string(),
-            })
-          )
-        ),
-      })
-    ),
-
-    // Wave status
     status: v.union(
-      v.literal('scheduled'),
-      v.literal('open_for_booking'),
-      v.literal('booking_closed'),
-      v.literal('in_progress'),
-      v.literal('completed'),
+      v.literal('active'),
+      v.literal('draft'),
+      v.literal('archived'),
       v.literal('cancelled')
     ),
-
-    // Booking and traveler management
-    totalBookings: v.number(),
-    totalTravelers: v.number(),
-
-    // Agency assignment (can override template assignment)
-    assignedTo: v.optional(v.array(v.id('users'))),
-
-    updatedAt: v.number(),
-    createdAt: v.number(),
   })
-    .index('by_template', ['tripTemplateId'])
-    .index('by_template_status', ['tripTemplateId', 'status'])
+    .index('by_tripId', ['tripId'])
+    .index('by_tripId_status', ['tripId', 'status'])
     .index('by_start_date', ['startDate'])
     .index('by_end_date', ['endDate'])
     .index('by_date_range', ['startDate', 'endDate'])
-    .index('by_status', ['status'])
-    .index('by_capacity', ['capacity'])
-    .index('by_available_spots', ['availableSpots'])
-    .index('by_price', ['pricePerPerson'])
-    .index('by_registration_deadline', ['registrationDeadline'])
-    .index('by_wave_number', ['tripTemplateId', 'waveNumber'])
-    .index('by_updated', ['updatedAt'])
-    .index('template_dates', ['tripTemplateId', 'startDate']),
+    .index('by_status', ['status']),
 
   // Bookings with agency context
   bookings: defineTable({
     tripId: v.id('trips'),
     agencyId: v.id('agencies'),
     customerId: v.optional(v.id('users')), // If customer has an account
-    agentId: v.id('users'), // Agent who created the booking
 
     // Customer information
     customer: v.object({
@@ -262,18 +240,6 @@ export default defineSchema({
       passportNumber: v.optional(v.string()),
       specialRequests: v.optional(v.string()),
     }),
-
-    // Booking details
-    numberOfTravelers: v.number(),
-    travelers: v.array(
-      v.object({
-        firstName: v.string(),
-        lastName: v.string(),
-        dateOfBirth: v.optional(v.string()),
-        passportNumber: v.optional(v.string()),
-        specialRequests: v.optional(v.string()),
-      })
-    ),
 
     // Pricing
     totalAmount: v.number(),
@@ -297,12 +263,9 @@ export default defineSchema({
 
     bookingReference: v.string(),
     notes: v.optional(v.string()),
-    createdAt: v.number(),
-    updatedAt: v.number(),
   })
     .index('by_agency', ['agencyId'])
     .index('by_trip', ['tripId'])
-    .index('by_agent', ['agentId'])
     .index('by_customer', ['customer.email'])
     .index('by_status', ['status'])
     .index('by_reference', ['bookingReference']),

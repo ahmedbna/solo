@@ -1,7 +1,12 @@
-'use client';
+import { Id } from '@/convex/_generated/dataModel';
+import { FetchAgency } from '@/components/dashboard/fetch-agency';
 
-import { Dashboard } from '@/components/dashboard/dashboard';
+type Props = {
+  params: { id: Id<'agencies'> };
+};
 
-export default function Host() {
-  return <Dashboard />;
+export default async function AgencyPage({ params }: Props) {
+  const { id } = await params;
+
+  return <FetchAgency agencyId={id} />;
 }
