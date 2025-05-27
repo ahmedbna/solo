@@ -224,7 +224,18 @@ export const createTrip = mutation({
     agencyId: v.id('agencies'),
     title: v.string(),
     description: v.string(),
-    images: v.array(v.string()),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
     country: v.string(),
     destinations: v.array(v.string()),
     inclusions: v.array(v.string()),
@@ -236,7 +247,18 @@ export const createTrip = mutation({
         title: v.string(),
         description: v.string(),
         dayNumber: v.number(),
-        images: v.array(v.string()),
+        images: v.optional(
+          v.array(
+            v.object({
+              fileName: v.string(),
+              fileUrl: v.string(),
+              name: v.string(),
+              size: v.number(),
+              type: v.string(),
+              response: v.any(),
+            })
+          )
+        ),
         city: v.optional(v.string()),
         country: v.optional(v.string()),
         latitude: v.optional(v.number()),
@@ -290,7 +312,18 @@ export const updateTrip = mutation({
     id: v.id('trips'),
     title: v.optional(v.string()),
     description: v.optional(v.string()),
-    images: v.optional(v.array(v.string())),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
     country: v.optional(v.string()),
     destinations: v.optional(v.array(v.string())),
     inclusions: v.optional(v.array(v.string())),
@@ -308,7 +341,18 @@ export const updateTrip = mutation({
           title: v.string(),
           description: v.string(),
           dayNumber: v.number(),
-          images: v.array(v.string()),
+          images: v.optional(
+            v.array(
+              v.object({
+                fileName: v.string(),
+                fileUrl: v.string(),
+                name: v.string(),
+                size: v.number(),
+                type: v.string(),
+                response: v.any(),
+              })
+            )
+          ),
           city: v.optional(v.string()),
           country: v.optional(v.string()),
           latitude: v.optional(v.number()),

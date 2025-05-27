@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { Doc, Id } from '@/convex/_generated/dataModel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
@@ -51,22 +51,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
-
-// Zod Schema for form validation
-const itineraryActivitySchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  day: z.number().min(1, 'Day must be at least 1'),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  images: z.array(z.string().url()).default([]),
-  city: z.string().optional(),
-  country: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
-  activityType: z.string().optional(),
-  estimatedDuration: z.string().optional(),
-});
+import { FileResponseType } from '../s3/lib/uploadFiles';
+import { deleteFile } from '../s3/actions';
+import { Image } from '../ui/image';
+import { DeleteFileModal } from '../s3/delete-file-modal';
+import { UploadFiles } from '../s3/upload-files';
 
 const tripFormSchema = z.object({
   title: z
@@ -85,27 +74,18 @@ const tripFormSchema = z.object({
   inclusions: z
     .array(z.string().min(1))
     .min(1, 'At least one inclusion is required'),
-  exclusions: z.array(z.string().min(1)).default([]),
+  exclusions: z.array(z.string().min(1)).optional(),
   basePrice: z.number().min(0, 'Base price must be positive'),
   type: z.enum(['domestic', 'international']),
-  itinerary: z
-    .array(itineraryActivitySchema)
-    .min(1, 'At least one activity is required'),
 });
 
 type TripFormData = z.infer<typeof tripFormSchema>;
 
 interface TripFormPageProps {
-  agencyId: Id<'agencies'>;
-  tripId?: Id<'trips'>;
-  onSuccess?: (tripId: Id<'trips'>) => void;
+  trip?: Doc<'trips'>;
 }
 
-export const TripForm = ({
-  agencyId,
-  tripId,
-  onSuccess,
-}: TripFormPageProps) => {
+export const TripForm = ({ trip }: TripFormPageProps) => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -113,15 +93,6 @@ export const TripForm = ({
   // Convex mutations
   const createTrip = useMutation(api.trips.createTrip);
   const updateTrip = useMutation(api.trips.updateTrip);
-
-  // Query existing trip if editing
-  const existingTrip = useQuery(
-    api.trips.getTripById,
-    tripId ? { id: tripId } : 'skip'
-  );
-
-  const isEditing = !!tripId;
-  const isLoading = isEditing && existingTrip === undefined;
 
   // Form setup
   const form = useForm<TripFormData>({
@@ -136,20 +107,6 @@ export const TripForm = ({
       exclusions: [],
       basePrice: 0,
       type: 'domestic',
-      itinerary: [
-        {
-          title: '',
-          description: '',
-          day: 1,
-          startTime: '',
-          endTime: '',
-          images: [],
-          city: '',
-          country: '',
-          activityType: '',
-          estimatedDuration: '',
-        },
-      ],
     },
   });
 
@@ -181,41 +138,21 @@ export const TripForm = ({
     name: 'exclusions',
   });
 
-  const {
-    fields: itineraryFields,
-    append: appendItinerary,
-    remove: removeItinerary,
-  } = useFieldArray({
-    control: form.control,
-    name: 'itinerary',
-  });
-
-  const {
-    fields: imageFields,
-    append: appendImage,
-    remove: removeImage,
-  } = useFieldArray({
-    control: form.control,
-    name: 'images',
-  });
-
   // Load existing trip data when editing
   useEffect(() => {
-    if (existingTrip && isEditing) {
+    if (trip) {
       form.reset({
-        title: existingTrip.title,
-        description: existingTrip.description,
-        images: existingTrip.images,
-        country: existingTrip.country,
-        destinations: existingTrip.destinations,
-        inclusions: existingTrip.inclusions,
-        exclusions: existingTrip.exclusions || [],
-        basePrice: existingTrip.basePrice,
-        type: existingTrip.type,
-        itinerary: existingTrip.itinerary,
+        title: trip.title,
+        description: trip.description,
+        country: trip.country,
+        destinations: trip.destinations,
+        inclusions: trip.inclusions,
+        exclusions: trip.exclusions || [],
+        basePrice: trip.basePrice,
+        type: trip.type,
       });
     }
-  }, [existingTrip, isEditing, form]);
+  }, [trip, form]);
 
   // Form submission
   const onSubmit = async (data: TripFormData) => {
@@ -223,26 +160,22 @@ export const TripForm = ({
     setSubmitError(null);
 
     try {
-      let resultTripId: Id<'trips'>;
-
-      if (isEditing && tripId) {
-        await updateTrip({
-          id: tripId,
-          ...data,
-        });
-        resultTripId = tripId;
-      } else {
-        resultTripId = await createTrip({
-          agencyId,
-          ...data,
-        });
-      }
-
-      if (onSuccess) {
-        onSuccess(resultTripId);
-      } else {
-        router.push(`/agencies/${agencyId}/trips/${resultTripId}`);
-      }
+      // if (trip) {
+      //   await updateTrip({
+      //     id: tripId,
+      //     ...data,
+      //   });
+      // } else {
+      //  await createTrip({
+      //     agencyId,
+      //     ...data,
+      //   });
+      // }
+      // if (onSuccess) {
+      //   onSuccess(resultTripId);
+      // } else {
+      //   router.push(`/agencies/${agencyId}/trips/${resultTripId}`);
+      // }
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : 'An error occurred'
@@ -252,30 +185,43 @@ export const TripForm = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <Loader2 className='h-8 w-8 animate-spin' />
-      </div>
-    );
-  }
-
   // Group activities by day for display
-  const groupedActivities = itineraryFields.reduce(
-    (acc, field, index) => {
-      const day = form.watch(`itinerary.${index}.day`) || 1;
-      if (!acc[day]) acc[day] = [];
-      acc[day].push({ field, index });
-      return acc;
-    },
-    {} as Record<number, Array<{ field: any; index: number }>>
-  );
+  // const groupedActivities = itineraryFields.reduce(
+  //   (acc, field, index) => {
+  //     const day = form.watch(`itinerary.${index}.day`) || 1;
+  //     if (!acc[day]) acc[day] = [];
+  //     acc[day].push({ field, index });
+  //     return acc;
+  //   },
+  //   {} as Record<number, Array<{ field: any; index: number }>>
+  // );
+
+  const onUploadComplete = async (files: FileResponseType[]) => {
+    // const existingImages = product.images ? product.images : [];
+    // if (files.length > 0) {
+    //   await uploadProductImages({
+    //     productId: product._id,
+    //     images: [...existingImages, ...files],
+    //   });
+    // }
+  };
+
+  const handleDeleteFile = async (file: FileResponseType) => {
+    // const newImages = product.images
+    //   ? product.images?.filter((image) => image.fileName !== file.fileName)
+    //   : [];
+    // await uploadProductImages({
+    //   productId: product._id,
+    //   images: newImages,
+    // });
+    // await deleteFile(file.fileName);
+  };
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='w-full flex items-center max-w-5xl p-4 md:p-8'
+        className='w-full flex items-center max-w-5xl mx-auto p-4 md:p-8'
       >
         <div className='space-y-8'>
           {/* Header */}
@@ -289,18 +235,16 @@ export const TripForm = ({
               <ChevronLeft className='h-5 w-5' />
             </Button>
             <h1 className='flex-1 shrink-0 whitespace-nowrap text-2xl font-semibold tracking-tight sm:grow-0'>
-              {isEditing
-                ? `Edit ${existingTrip?.title || 'Trip'}`
-                : 'Create New Trip'}
+              {trip ? `Edit ${trip?.title || 'Trip'}` : 'Create New Trip'}
             </h1>
             <Badge
               variant='outline'
               className='ml-auto sm:ml-0 text-muted-foreground'
             >
-              {isEditing ? 'Editing' : 'Draft'}
+              {trip ? 'Editing' : 'Draft'}
             </Badge>
             <div className='hidden items-center gap-2 md:ml-auto md:flex'>
-              {isEditing && (
+              {/* {trip && (
                 <Button asChild size='sm' variant='outline'>
                   <Link href={`/agencies/${agencyId}/trips/${tripId}`}>
                     <div className='flex items-center gap-1'>
@@ -309,14 +253,15 @@ export const TripForm = ({
                     </div>
                   </Link>
                 </Button>
-              )}
+              )} */}
+
               <Button type='submit' size='sm' disabled={isSubmitting}>
                 {isSubmitting ? (
                   <Loader2 className='h-3.5 w-3.5 animate-spin' />
                 ) : (
                   <div className='flex items-center gap-1'>
                     <Save className='h-3.5 w-3.5' />
-                    <span>{isEditing ? 'Update Trip' : 'Save Trip'}</span>
+                    <span>{trip ? 'Update Trip' : 'Save Trip'}</span>
                   </div>
                 )}
               </Button>
@@ -386,7 +331,6 @@ export const TripForm = ({
                 </CardContent>
               </Card>
 
-              {/* Trip Images */}
               <Card>
                 <CardHeader>
                   <CardTitle>Trip Images</CardTitle>
@@ -394,46 +338,33 @@ export const TripForm = ({
                     Add compelling images to showcase your trip
                   </CardDescription>
                 </CardHeader>
-                <CardContent className='space-y-4'>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    {imageFields.map((field, index) => (
-                      <div key={field.id} className='flex gap-2'>
-                        <FormField
-                          control={form.control}
-                          name={`images.${index}`}
-                          render={({ field }) => (
-                            <FormItem className='flex-1'>
-                              <FormControl>
-                                <Input
-                                  placeholder='https://example.com/image.jpg'
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='icon'
-                          onClick={() => removeImage(index)}
-                          disabled={imageFields.length === 1}
-                        >
-                          <X className='h-4 w-4' />
-                        </Button>
-                      </div>
-                    ))}
+                <CardContent>
+                  <div className='grid gap-2'>
+                    <div className='grid grid-cols-3 gap-2'>
+                      {trip && trip.images
+                        ? trip.images.map((image) => (
+                            <div className='relative group ' key={image.name}>
+                              <Image
+                                alt='Trip image'
+                                className='aspect-square h-full w-full rounded-md object-cover transition-opacity duration-300 group-hover:opacity-50'
+                                height={84}
+                                width={84}
+                                src={image.fileUrl}
+                              />
+                              <DeleteFileModal
+                                file={image}
+                                handleDeleteFile={() => handleDeleteFile(image)}
+                              />
+                            </div>
+                          ))
+                        : null}
+
+                      <UploadFiles
+                        thumbnails={false}
+                        onUploadComplete={onUploadComplete}
+                      />
+                    </div>
                   </div>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    onClick={() => appendImage('')}
-                  >
-                    <Plus className='h-4 w-4 mr-2' />
-                    Add Image
-                  </Button>
                 </CardContent>
               </Card>
 
@@ -530,214 +461,6 @@ export const TripForm = ({
                       Add Exclusion
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Itinerary Activities */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Trip Activities</CardTitle>
-                  <CardDescription>
-                    Add activities and organize them by day and time
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className='space-y-6'>
-                  {/* Display activities grouped by day */}
-                  {Object.entries(groupedActivities)
-                    .sort(([a], [b]) => Number(a) - Number(b))
-                    .map(([day, activities]) => (
-                      <div key={day} className='space-y-4'>
-                        <div className='flex items-center gap-2'>
-                          <Badge variant='secondary'>Day {day}</Badge>
-                          <div className='h-px bg-border flex-1' />
-                        </div>
-
-                        {activities.map(({ field, index }) => (
-                          <Card key={field.id} className='p-4'>
-                            <div className='flex items-center justify-between mb-4'>
-                              <div className='flex items-center gap-2'>
-                                <Clock className='h-4 w-4 text-muted-foreground' />
-                                <span className='text-sm text-muted-foreground'>
-                                  Activity {index + 1}
-                                </span>
-                              </div>
-                              <Button
-                                type='button'
-                                variant='ghost'
-                                size='sm'
-                                onClick={() => removeItinerary(index)}
-                                disabled={itineraryFields.length === 1}
-                              >
-                                <Trash2 className='h-4 w-4' />
-                              </Button>
-                            </div>
-
-                            <div className='grid grid-cols-1 gap-4'>
-                              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.day`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Day</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          type='number'
-                                          min='1'
-                                          {...field}
-                                          onChange={(e) =>
-                                            field.onChange(
-                                              parseInt(e.target.value) || 1
-                                            )
-                                          }
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.startTime`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Start Time</FormLabel>
-                                      <FormControl>
-                                        <Input type='time' {...field} />
-                                      </FormControl>
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.endTime`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>End Time</FormLabel>
-                                      <FormControl>
-                                        <Input type='time' {...field} />
-                                      </FormControl>
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-
-                              <FormField
-                                control={form.control}
-                                name={`itinerary.${index}.title`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Activity Title</FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        placeholder='e.g., City Walking Tour'
-                                        {...field}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              <FormField
-                                control={form.control}
-                                name={`itinerary.${index}.description`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                      <Textarea
-                                        placeholder='Describe the activity...'
-                                        {...field}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.city`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>City</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          placeholder='City name'
-                                          {...field}
-                                        />
-                                      </FormControl>
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.activityType`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Activity Type</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          placeholder='e.g., Sightseeing, Adventure'
-                                          {...field}
-                                        />
-                                      </FormControl>
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name={`itinerary.${index}.estimatedDuration`}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Duration</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          placeholder='e.g., 2 hours'
-                                          {...field}
-                                        />
-                                      </FormControl>
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    ))}
-
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={() =>
-                      appendItinerary({
-                        title: '',
-                        description: '',
-                        day:
-                          Math.max(
-                            ...Object.keys(groupedActivities).map(Number),
-                            0
-                          ) + 1,
-                        startTime: '',
-                        endTime: '',
-                        images: [],
-                        city: '',
-                        country: '',
-                        activityType: '',
-                        estimatedDuration: '',
-                      })
-                    }
-                  >
-                    <Plus className='h-4 w-4 mr-2' />
-                    Add Activity
-                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -888,7 +611,7 @@ export const TripForm = ({
               ) : (
                 <Save className='h-4 w-4 mr-2' />
               )}
-              {isEditing ? 'Update Trip' : 'Save Trip'}
+              {trip ? 'Update Trip' : 'Save Trip'}
             </Button>
           </div>
         </div>

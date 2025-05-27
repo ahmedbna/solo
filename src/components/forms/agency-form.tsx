@@ -163,242 +163,245 @@ export const AgencyForm = ({ agency }: Props) => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-        {/* Basic Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-lg'>Basic Information</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <FormField
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Agency Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Enter your agency name' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className='max-w-3xl'>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-lg'>Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Agency Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Enter your agency name' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='bio'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder='Tell us about your agency...'
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    A brief description of your agency and services
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
+              <FormField
+                control={form.control}
+                name='bio'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bio</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='Tell us about your agency...'
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      A brief description of your agency and services
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
-        {/* Contact Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-lg flex items-center gap-2'>
-              <Mail className='w-4 h-4' />
-              Contact Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <FormField
-              control={form.control}
-              name='website'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Globe className='w-4 h-4' />
-                    Website
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder='https://yourwebsite.com' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {/* Contact Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-lg flex items-center gap-2'>
+                <Mail className='w-4 h-4' />
+                Contact Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='website'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='flex items-center gap-2'>
+                      <Globe className='w-4 h-4' />
+                      Website
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder='https://yourwebsite.com' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='email'
-                      placeholder='info@youragency.com'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='email'
+                        placeholder='info@youragency.com'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='phone'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Phone className='w-4 h-4' />
-                    Phone
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder='+1 (555) 123-4567' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='phone'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='flex items-center gap-2'>
+                      <Phone className='w-4 h-4' />
+                      Phone
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder='+1 (555) 123-4567' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='taxId'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Hash className='w-4 h-4' />
-                    Tax ID
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder='Tax identification number' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
+              <FormField
+                control={form.control}
+                name='taxId'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='flex items-center gap-2'>
+                      <Hash className='w-4 h-4' />
+                      Tax ID
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Tax identification number'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
-        {/* Social Media Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-lg'>Social Media</CardTitle>
-          </CardHeader>
+          {/* Social Media Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-lg'>Social Media</CardTitle>
+            </CardHeader>
 
-          <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <FormField
-              control={form.control}
-              name='socialMedia.facebook'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Facebook</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://facebook.com/youragency'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='socialMedia.facebook'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Facebook</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://facebook.com/youragency'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='socialMedia.instagram'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://instagram.com/youragency'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='socialMedia.instagram'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Instagram</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://instagram.com/youragency'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='socialMedia.twitter'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Twitter</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://twitter.com/youragency'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='socialMedia.twitter'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Twitter</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://twitter.com/youragency'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='socialMedia.linkedin'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LinkedIn</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://linkedin.com/company/youragency'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='socialMedia.linkedin'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>LinkedIn</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://linkedin.com/company/youragency'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='socialMedia.youtube'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>YouTube</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://youtube.com/@youragency'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
+              <FormField
+                control={form.control}
+                name='socialMedia.youtube'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>YouTube</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://youtube.com/@youragency'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
-        <Separator />
-
-        {/* Form Actions */}
-        <Button
-          type='submit'
-          className='w-full'
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting
-            ? agency
-              ? 'Updating...'
-              : 'Creating...'
-            : agency
-              ? 'Update Agency'
-              : 'Create Agency'}
-        </Button>
-      </form>
-    </Form>
+          {/* Form Actions */}
+          <Button
+            type='submit'
+            className='w-full'
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting
+              ? agency
+                ? 'Updating...'
+                : 'Creating...'
+              : agency
+                ? 'Update Agency'
+                : 'Create Agency'}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };

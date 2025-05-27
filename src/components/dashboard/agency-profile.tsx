@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Plus,
@@ -15,7 +14,6 @@ import {
   Twitter,
   Linkedin,
   Youtube,
-  Users,
 } from 'lucide-react';
 import { Doc } from '@/convex/_generated/dataModel';
 import { Image } from '@/components/ui/image';
@@ -64,8 +62,6 @@ export const AgencyProfile = ({ agency }: Props) => {
     await deleteFile(file.fileName);
   };
 
-  const isAdmin = true;
-
   const socialMediaPlatforms = [
     {
       key: 'facebook',
@@ -92,6 +88,8 @@ export const AgencyProfile = ({ agency }: Props) => {
   const activeSocialMedia = socialMediaPlatforms.filter(
     (platform) => agency.socialMedia?.[platform.key as keyof SocialMedia]
   );
+
+  const isAdmin = true;
 
   return (
     <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 '>
@@ -145,12 +143,12 @@ export const AgencyProfile = ({ agency }: Props) => {
 
             {/* Agency Details */}
             <div className='space-y-2'>
-              <h1 className='text-3xl sm:text-4xl font-bold'>{agency.name}</h1>
-              {agency.bio && (
-                <p className='text-muted-foreground text-lg max-w-2xl leading-relaxed'>
-                  {agency.bio}
-                </p>
+              {agency.taxId && (
+                <Badge variant='secondary' className='text-xs'>
+                  Tax ID: {agency.taxId}
+                </Badge>
               )}
+              <h1 className='text-3xl sm:text-4xl font-bold'>{agency.name}</h1>
             </div>
           </div>
 
@@ -167,10 +165,10 @@ export const AgencyProfile = ({ agency }: Props) => {
       </div>
 
       <div className='space-y-2'>
-        {agency.taxId && (
-          <Badge variant='secondary' className='text-xs'>
-            Tax ID: {agency.taxId}
-          </Badge>
+        {agency.bio && (
+          <p className='text-muted-foreground max-w-2xl leading-relaxed'>
+            {agency.bio}
+          </p>
         )}
 
         <div className='flex items-center gap-2'>
@@ -186,7 +184,7 @@ export const AgencyProfile = ({ agency }: Props) => {
                   }
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-muted-foreground hover:text-blue-800 font-medium'
+                  className='text-muted-foreground hover:text-yellow-400 font-medium'
                 >
                   {agency.website}
                 </a>
@@ -198,7 +196,7 @@ export const AgencyProfile = ({ agency }: Props) => {
                 <Phone className='w-4 h-4 text-muted-foreground' />
                 <a
                   href={`tel:${agency.phone}`}
-                  className='text-muted-foreground hover:text-blue-800 font-medium'
+                  className='text-muted-foreground hover:text-yellow-400 font-medium'
                 >
                   {agency.phone}
                 </a>
@@ -210,7 +208,7 @@ export const AgencyProfile = ({ agency }: Props) => {
                 <Mail className='w-4 h-4 text-muted-foreground' />
                 <a
                   href={`mailto:${agency.email}`}
-                  className='text-muted-foreground hover:text-blue-800 font-medium'
+                  className='text-muted-foreground hover:text-yellow-400 font-medium'
                 >
                   {agency.email}
                 </a>

@@ -159,7 +159,18 @@ export default defineSchema({
     type: v.union(v.literal('domestic'), v.literal('international')),
 
     description: v.optional(v.string()),
-    images: v.optional(v.array(v.string())),
+    images: v.optional(
+      v.array(
+        v.object({
+          fileName: v.string(),
+          fileUrl: v.string(),
+          name: v.string(),
+          size: v.number(),
+          type: v.string(),
+          response: v.any(),
+        })
+      )
+    ),
 
     country: v.optional(v.string()), // e.g., "US"
     destinations: v.optional(v.array(v.string())), // e.g., "US"
@@ -172,14 +183,24 @@ export default defineSchema({
       v.literal('active'),
       v.literal('archived')
     ),
-
     itinerary: v.optional(
       v.array(
         v.object({
           title: v.optional(v.string()),
           description: v.optional(v.string()),
           dayNumber: v.number(),
-          images: v.optional(v.array(v.string())),
+          images: v.optional(
+            v.array(
+              v.object({
+                fileName: v.string(),
+                fileUrl: v.string(),
+                name: v.string(),
+                size: v.number(),
+                type: v.string(),
+                response: v.any(),
+              })
+            )
+          ),
           city: v.optional(v.string()),
           country: v.optional(v.string()),
           latitude: v.optional(v.number()),
